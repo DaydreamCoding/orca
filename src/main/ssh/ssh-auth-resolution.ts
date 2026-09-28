@@ -48,7 +48,11 @@ function expandIdentityAgentEnv(value: string): string | undefined {
   if (value === 'SSH_AUTH_SOCK') {
     return process.env.SSH_AUTH_SOCK || undefined
   }
+  return expandAgentSocketEnv(value)
+}
 
+/** Expands `$VAR` / `${VAR}` in an agent socket value; undefined when any variable is unset. */
+export function expandAgentSocketEnv(value: string): string | undefined {
   let missingEnv = false
   const expanded = value.replace(/\$(\w+)|\$\{([^}]+)\}/g, (_match, bare, braced) => {
     const envName = String(bare || braced)

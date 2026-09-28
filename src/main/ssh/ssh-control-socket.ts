@@ -14,6 +14,7 @@ export type SystemSshResolvedConfig = Pick<
   | 'identityAgent'
   | 'identitiesOnly'
   | 'forwardAgent'
+  | 'forwardAgentSocket'
   | 'proxyCommand'
   | 'proxyJump'
   | 'proxyUseFdpass'
@@ -122,6 +123,10 @@ function normalizeResolvedConfig(
     identityAgent: resolvedConfig.identityAgent || '',
     identitiesOnly: resolvedConfig.identitiesOnly || false,
     forwardAgent: resolvedConfig.forwardAgent || false,
+    // Why only when set: keeps existing masters' paths unchanged for `ForwardAgent yes|no` users.
+    ...(resolvedConfig.forwardAgentSocket
+      ? { forwardAgentSocket: resolvedConfig.forwardAgentSocket }
+      : {}),
     proxyCommand: resolvedConfig.proxyCommand || '',
     proxyJump: resolvedConfig.proxyJump || '',
     proxyUseFdpass: resolvedConfig.proxyUseFdpass || false,
