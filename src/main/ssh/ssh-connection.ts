@@ -84,6 +84,7 @@ import {
   describeAgentForwardingIntent,
   resolveAgentForwardingIntent
 } from './ssh-agent-forwarding-intent'
+import { waitForLoginShellAgent } from './ssh-login-shell-agent'
 import {
   AGENT_FORWARDING_EXEC_OPTIONS,
   isAgentForwardingRefusedError,
@@ -861,6 +862,8 @@ export class SshConnection {
     this.keyboardInteractiveCancelled = false
     this.keyboardInteractivePasswordState = { passwordAutoAnswered: false }
 
+    // Why before ssh -G: the opt-in login-shell agent must be in place before auth or forwarding.
+    await waitForLoginShellAgent()
     const resolved = await resolveWithSshG(this.target.configHost || this.target.label).catch(
       () => null
     )
