@@ -162,8 +162,7 @@ function createAgentSocketBinding(
   }
   const binding = new RelayAgentSocketBinding({
     linkPath: agentLinkPathForRelaySocket(options.sockPath),
-    isSessionOwner: (clientId) =>
-      runtime.ptyConsumerSessionAdapter.clientInstanceIdFor(clientId) !== null
+    isSessionOwner: (clientId) => runtime.ptyConsumerSessionAdapter.isSessionOwner(clientId)
   })
   binding.start()
   runtime.ptyConsumerSessionAdapter.onOwnerCommitted(() => binding.sessionOwnerChanged())

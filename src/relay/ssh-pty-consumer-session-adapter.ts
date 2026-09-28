@@ -119,6 +119,11 @@ export class SshPtyConsumerSessionAdapter {
     return this.session.activeClientInstanceId(String(clientId))
   }
 
+  /** True only for the session owner's active grant — a subscriber also has an active grant. */
+  isSessionOwner(clientId: number): boolean {
+    return this.session.activeGrant(String(clientId))?.role === 'session-owner'
+  }
+
   /** Fires after an owner grant is published, including one that displaced the previous owner. */
   onOwnerCommitted(listener: () => void): () => void {
     this.ownerCommittedListeners.add(listener)

@@ -1,7 +1,7 @@
 import type { SshTarget } from '../../shared/ssh-types'
 import type { SshResolvedConfig } from './ssh-config-parser'
 import { expandAgentSocketEnv, resolveAgentSocket } from './ssh-auth-resolution'
-import { isOpenSshConfigBackedTarget } from './system-ssh-args'
+import { isOpenSshConfigBackedTarget } from './ssh-config-backed-target'
 
 export type AgentForwardingDisabledReason =
   | 'not-requested'

@@ -7,7 +7,7 @@ How Orca forwards your local SSH agent to an SSH host, why a remote shell keeps 
 **A remote process sees the agent that a fresh `ssh <host>` on the current connection would see** — no more, no less. Three consequences:
 
 1. **Forwarding follows OpenSSH semantics, not the login path.** `ForwardAgent yes|no|<path>|$VAR`, `IdentityAgent` (including `none`) and the per-host override decide it. How authentication ended — agent, disk key, passphrase, password, keyboard-interactive — never does, and `IdentitiesOnly` narrows only what is _offered to the server_.
-2. **The agent follows the live connection.** Shells, relay git and agent exec keep working after a reconnect without re-exporting anything.
+2. **The agent follows the live connection.** Shells, relay git and agent exec keep working after a reconnect without re-exporting anything. This is deliberate authority, the same as tmux's `~/.ssh/ssh_auth_sock` symlink: any process the relay started for this remote account — including a shell from before the reconnect — can use the agent of the connection that is live now, and none while it is not. Hosts where earlier processes must not inherit that authority should not enable forwarding.
 3. **No borrowing.** If the current connection forwards nothing, remote processes have no agent — never an older connection's.
 
 ## Mechanism

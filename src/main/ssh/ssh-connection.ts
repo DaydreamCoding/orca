@@ -88,8 +88,7 @@ import { waitForLoginShellAgent } from './ssh-login-shell-agent'
 import {
   AGENT_FORWARDING_EXEC_OPTIONS,
   isAgentForwardingRefusedError,
-  SshAgentForwardingRequest,
-  type SshAgentForwardingState
+  SshAgentForwardingRequest
 } from './ssh-agent-forwarding-request'
 import {
   requiresSystemSshForSecurityKey,
@@ -339,15 +338,6 @@ export class SshConnection {
       }
       return open(false)
     }
-  }
-
-  /** ssh2 transport only; system OpenSSH negotiates forwarding itself. */
-  getAgentForwardingState(): SshAgentForwardingState {
-    const client = this.client
-    if (this.useSystemSshTransport || !client) {
-      return 'off'
-    }
-    return this.agentForwardingByClient.get(client)?.current ?? 'off'
   }
 
   async sftp(options?: AbortSignal | { signal?: AbortSignal }): Promise<SFTPWrapper> {

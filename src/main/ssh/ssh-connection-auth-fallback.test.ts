@@ -147,7 +147,8 @@ describe('SshConnection', () => {
       const fallbackConfig = clientInstances[1].lastConnectConfig
       expect(offeredAuthMethods(fallbackConfig)).not.toContain('agent')
       expect(connectConfigField(fallbackConfig, 'agent')).toBe('/tmp/agent.sock')
-      expect(conn.getAgentForwardingState()).toBe('pending')
+      await conn.exec('true')
+      expect(clientInstances[1].execCalls.at(-1)?.agentForward).toBe(true)
     } finally {
       rmSync(tempDir, { recursive: true, force: true })
     }

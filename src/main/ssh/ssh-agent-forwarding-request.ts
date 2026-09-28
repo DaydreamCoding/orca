@@ -1,6 +1,6 @@
 import type { ExecOptions } from 'ssh2'
 
-export type SshAgentForwardingState = 'off' | 'pending' | 'granted' | 'refused'
+type SshAgentForwardingState = 'off' | 'pending' | 'granted' | 'refused'
 
 // ssh2 (lib/client.js reqAgentFwd) rejects the whole exec with exactly this message.
 const AGENT_FORWARDING_REFUSED_MESSAGE = 'Unable to request agent forwarding'
@@ -28,10 +28,6 @@ export class SshAgentForwardingRequest {
 
   constructor(requested: boolean) {
     this.state = requested ? 'pending' : 'off'
-  }
-
-  get current(): SshAgentForwardingState {
-    return this.state
   }
 
   shouldRequest(): boolean {

@@ -33,13 +33,14 @@ describe('SshConnection agent forwarding requests', () => {
     resetSshConnectionMocks()
   })
 
-  it('requests forwarding on exec and records the grant', async () => {
+  it('requests forwarding on every exec once granted', async () => {
     const conn = await connectWithForwarding()
 
-    await conn.exec('true')
+    await conn.exec('first')
+    await conn.exec('second')
 
-    expect(clientInstances[0].execCalls.at(-1)?.agentForward).toBe(true)
-    expect(conn.getAgentForwardingState()).toBe('granted')
+    // ssh2 sends the request once per connection and short-circuits later asks.
+    expect(clientInstances[0].execCalls.map((call) => call.agentForward)).toEqual([true, true])
   })
 
   it('does not request forwarding when OpenSSH config leaves it off', async () => {
@@ -53,7 +54,6 @@ describe('SshConnection agent forwarding requests', () => {
     await conn.exec('true')
 
     expect(clientInstances[0].execCalls.map((call) => call.agentForward)).toEqual([false])
-    expect(conn.getAgentForwardingState()).toBe('off')
   })
 
   it('keeps the connection usable when the server refuses forwarding', async () => {
@@ -71,7 +71,6 @@ describe('SshConnection agent forwarding requests', () => {
       { cmd: expect.stringContaining('first'), agentForward: false },
       { cmd: expect.stringContaining('second'), agentForward: false }
     ])
-    expect(conn.getAgentForwardingState()).toBe('refused')
     expect(warn.mock.calls.filter(([line]) => String(line).includes('refused agent'))).toHaveLength(
       1
     )
@@ -83,13 +82,13 @@ describe('SshConnection agent forwarding requests', () => {
     ssh2Mock.refuseAgentForwarding = true
     const conn = await connectWithForwarding()
     await conn.exec('first')
-    expect(conn.getAgentForwardingState()).toBe('refused')
+    await conn.exec('second')
+    expect(clientInstances[0].execCalls.at(-1)?.agentForward).toBe(false)
 
     ssh2Mock.refuseAgentForwarding = false
     await conn.reconnect()
     await conn.exec('after-reconnect')
 
     expect(clientInstances.at(-1)?.execCalls.at(-1)?.agentForward).toBe(true)
-    expect(conn.getAgentForwardingState()).toBe('granted')
   })
 })

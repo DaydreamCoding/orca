@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { isAbsolute, join as pathJoin } from 'node:path'
 import type { SshTarget } from '../../shared/ssh-types'
 import type { SshResolvedConfig } from './ssh-config-parser'
+import { resolveAgentForwardingIntent } from './ssh-agent-forwarding-intent'
 
 export type SystemSshResolvedConfig = Pick<
   SshResolvedConfig,
@@ -45,9 +46,13 @@ export function getControlSocketPath(
     return null
   }
 
+  // Why the effective socket and not only the setting: a master forwards the agent it was spawned
+  // with, and the opt-in login-shell agent can change SSH_AUTH_SOCK mid-session.
+  const forwarding = resolveAgentForwardingIntent(target, resolvedConfig ?? null)
   // Why: include both persisted target fields and fresh ssh -G output so a
   // live ControlPersist master is not reused after config-backed routes change.
   const key = JSON.stringify({
+    ...(forwarding.enabled ? { forwardedAgentSocket: forwarding.socket } : {}),
     target: {
       id: target.id,
       configHost: target.configHost || '',
