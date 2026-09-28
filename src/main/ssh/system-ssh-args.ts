@@ -84,6 +84,11 @@ export function buildSshArgs(target: SshTarget, options?: SystemSshBuildArgsOpti
     args.push('-o', 'IdentitiesOnly=yes')
   }
 
+  // Why both values: an explicit "off" must also beat a `Host *` ForwardAgent in ssh_config.
+  if (!useConfigHost && target.forwardAgent !== undefined) {
+    args.push('-o', `ForwardAgent=${target.forwardAgent ? 'yes' : 'no'}`)
+  }
+
   if (!useConfigHost && target.gssapiAuthentication && !options?.gssapiOnly) {
     // Why: manual targets bypass ssh_config, so Kerberos auth must be
     // requested explicitly; config-backed hosts inherit it from their entry.

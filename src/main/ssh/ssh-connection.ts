@@ -81,6 +81,10 @@ import {
   hasAgentAuthentication
 } from './ssh-private-key-authentication'
 import {
+  describeAgentForwardingIntent,
+  resolveAgentForwardingIntent
+} from './ssh-agent-forwarding-intent'
+import {
   AGENT_FORWARDING_EXEC_OPTIONS,
   isAgentForwardingRefusedError,
   SshAgentForwardingRequest,
@@ -894,6 +898,11 @@ export class SshConnection {
     this.useSystemSshTransport = false
 
     const config = buildConnectConfig(this.target, resolved)
+    console.warn(
+      `[ssh] Agent forwarding for ${this.target.label}: ${describeAgentForwardingIntent(
+        resolveAgentForwardingIntent(this.target, resolved)
+      )}`
+    )
 
     // Why: ssh2 doesn't support ProxyCommand/ProxyJump natively; spawn the resolved proxy and pipe its stdin/stdout as config.sock.
     const effectiveProxy = resolveEffectiveProxy(this.target, resolved)

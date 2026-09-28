@@ -58,7 +58,9 @@ export function getControlSocketPath(
       jumpHost: target.jumpHost || '',
       identityFile: target.identityFile || '',
       identityAgent: target.identityAgent || '',
-      identitiesOnly: target.identitiesOnly || false
+      identitiesOnly: target.identitiesOnly || false,
+      // Why only when set: a master's forwarding is fixed at spawn, but unset keeps old paths.
+      ...(target.forwardAgent !== undefined ? { forwardAgent: target.forwardAgent } : {})
     },
     resolved: normalizeResolvedConfig(resolvedConfig),
     // Why: a Kerberos-only session must not reuse a master authenticated by a key.

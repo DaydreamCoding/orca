@@ -149,6 +149,22 @@ Host eq
     })
   })
 
+  it('parses ForwardAgent keywords and treats a socket path as enabled', () => {
+    const config = `
+Host on
+  ForwardAgent yes
+Host off
+  ForwardAgent no
+Host path
+  ForwardAgent ~/.ssh/agent.sock
+Host first-wins
+  ForwardAgent no
+  ForwardAgent yes
+`
+    const byHost = Object.fromEntries(parseSshConfig(config).map((h) => [h.host, h.forwardAgent]))
+    expect(byHost).toEqual({ on: true, off: false, path: true, 'first-wins': false })
+  })
+
   it('parses IdentityAgent with ~ expansion', () => {
     const config = `
 Host myserver
